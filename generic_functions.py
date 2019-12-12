@@ -56,7 +56,12 @@ def Gf_bloch(E,H,lel,S1,S2,eta=1.e-7):
     invG = np.diag(np.ones((len(H),))*(E+1j*eta)) - H
     invG[:lel,:lel] -= S1
     invG[rel:,rel:] -= S2
-    G = la.inv(invG)
+    #G = la.inv(invG)
+    ng = len(invG)
+    u, s, vh = np.linalg.svd(invG, full_matrices=True)
+    s = np.diag(1/s)
+    G = np.zeros((ng,ng),dtype=complex) # pseudoinverse
+    G = np.matmul(np.transpose(np.conj(vh)),np.matmul(s,np.transpose(np.conj(u))))
     return G
 
 vGf = np.vectorize(Gf,otypes=[np.ndarray]*3,excluded=[1,2,3,4])
